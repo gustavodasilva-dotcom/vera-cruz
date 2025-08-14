@@ -3,6 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "tokenization/tokenizer.h"
+
 int main(int argc, char *argv[])
 {
     if (argc != 2)
@@ -25,6 +27,42 @@ int main(int argc, char *argv[])
         fprintf(stderr, "The file %s does not exist.\n", file_name);
         return EXIT_FAILURE;
     }
+
+    FILE *fp = fopen(file_name, "r");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "Could not open file %s", file_name);
+        return EXIT_FAILURE;
+    }
+
+    fseek(fp, 0, SEEK_END);
+    long file_size = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+
+    char *buffer = (char *)malloc(file_size + 1);
+    if (buffer == NULL)
+    {
+        fprintf(stderr, "Error allocating memory to read file.");
+        fclose(fp);
+        return EXIT_FAILURE;
+    }
+
+    size_t bytes_read = fread(buffer, 1, file_size, fp);
+    if (bytes_read != file_size)
+    {
+        printf("Error reading file.");
+        free(buffer);
+        fclose(fp);
+        return EXIT_FAILURE;
+    }
+
+    buffer[file_size] = '\0';
+
+    fclose(fp);
+
+    tokenize(buffer);
+
+    free(buffer);
 
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,6 @@
+classe publica Programa
+{
+    funcao principal() vazia
+    {
+    }
+}
